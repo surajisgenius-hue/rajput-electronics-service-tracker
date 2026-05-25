@@ -75,21 +75,8 @@ export default function RecordTable({ records, onEdit, onDelete, onShowQr }) {
                   <div className="text-xs text-slate-500">{record.customerPhone}</div>
                 </td>
                 <td className="px-4 py-4 text-sm text-slate-200">
-                  <div className="flex items-center gap-3">
-                    {record.imageUrl && (
-                      <a href={record.imageUrl} target="_blank" rel="noreferrer" title="Open service image">
-                        <img
-                          src={record.imageUrl}
-                          alt=""
-                          className="h-10 w-10 rounded-lg border border-slate-700 object-cover"
-                        />
-                      </a>
-                    )}
-                    <div>
-                      <div className="font-semibold">{record.productName}</div>
-                      <div className="text-xs text-slate-500">{record.brand}</div>
-                    </div>
-                  </div>
+                  <div className="font-semibold">{record.productName}</div>
+                  <div className="text-xs text-slate-500">{record.brand}</div>
                 </td>
                 <td className="px-4 py-4 text-sm text-slate-300">{record.serviceType}</td>
                 <td className="px-4 py-4"><StatusBadge status={record.status} /></td>

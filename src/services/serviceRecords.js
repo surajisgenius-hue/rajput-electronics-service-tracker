@@ -13,14 +13,12 @@ import {
   updateDoc,
   where
 } from 'firebase/firestore';
-import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { db, storage } from '../firebase.js';
+import { db } from '../firebase.js';
 
 const LOCAL_RECORDS_KEY = 'rajput-electronics-service-records';
 const LOCAL_RECORDS_EVENT = 'rajput-electronics-records-updated';
 const COMPLETED_STATUSES = ['Completed', 'Delivered'];
 const COMPLETED_RECORD_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-export const MAX_RECORD_IMAGE_BYTES = 5 * 1024 * 1024;
 
 function isCompletedStatus(status) {
   return COMPLETED_STATUSES.includes(status);
@@ -40,49 +38,6 @@ function toMillis(value) {
 
 function completedAtMillis(record) {
   return toMillis(record.completedAt) || toMillis(record.completedAtLocal);
-}
-
-function stripRecordFormData(data) {
-  const { imageFile, imagePreviewUrl, removeImage, ...recordData } = data;
-  return recordData;
-}
-
-function imageExtension(file) {
-  const fromName = file.name?.split('.').pop()?.toLowerCase();
-  if (fromName && /^[a-z0-9]+$/.test(fromName)) return fromName;
-  return file.type?.split('/').pop() || 'jpg';
-}
-
-async function uploadRecordImage(file, trackingId) {
-  if (!file) return null;
-  if (!storage) {
-    throw new Error('Firebase Storage is not configured. Enable Storage and try again.');
-  }
-  if (!file.type?.startsWith('image/')) {
-    throw new Error('Please upload an image file.');
-  }
-  if (file.size > MAX_RECORD_IMAGE_BYTES) {
-    throw new Error('Image size should be 5 MB or less.');
-  }
-
-  const safeTrackingId = trackingId.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-  const imagePath = `service-record-images/${safeTrackingId}/${Date.now()}.${imageExtension(file)}`;
-  const imageRef = ref(storage, imagePath);
-  await uploadBytes(imageRef, file, {
-    contentType: file.type,
-    customMetadata: { trackingId }
-  });
-  const imageUrl = await getDownloadURL(imageRef);
-  return { imageName: file.name || 'Service image', imagePath, imageUrl };
-}
-
-async function deleteRecordImage(imagePath) {
-  if (!imagePath || !storage) return;
-  try {
-    await deleteObject(ref(storage, imagePath));
-  } catch (error) {
-    console.warn(`Unable to delete image ${imagePath}:`, error.message);
-  }
 }
 
 function getLocalRecords() {
@@ -234,7 +189,7 @@ export async function cleanupExpiredCompletedRecords(records) {
     await Promise.all(
       expiredRecords.map(async (record) => {
         try {
-          await deleteServiceRecord(record.id, record.trackingId, record.imagePath);
+          await deleteServiceRecord(record.id, record.trackingId);
         } catch (error) {
           console.warn(`Unable to auto-delete completed record ${record.trackingId}:`, error.message);
         }
@@ -247,19 +202,14 @@ export async function cleanupExpiredCompletedRecords(records) {
 
 export async function addServiceRecord(data) {
   const trackingId = data.trackingId || generateTrackingId();
-  const imageData = await uploadRecordImage(data.imageFile, trackingId);
-  const recordData = {
-    ...stripRecordFormData(data),
-    ...imageData
-  };
   const localId = crypto.randomUUID?.() || `local-${Date.now()}`;
   const payload = {
-    ...recordData,
+    ...data,
     id: localId,
     trackingId,
     trackingIdLower: trackingId.toLowerCase(),
     createdAtLocal: new Date().toISOString(),
-    completedAtLocal: isCompletedStatus(recordData.status) ? new Date().toISOString() : undefined,
+    completedAtLocal: isCompletedStatus(data.status) ? new Date().toISOString() : undefined,
     updatedAtLocal: new Date().toISOString()
   };
 
@@ -267,10 +217,10 @@ export async function addServiceRecord(data) {
 
   try {
     const cloudPayload = {
-      ...recordData,
+      ...data,
       trackingId,
       trackingIdLower: trackingId.toLowerCase(),
-      completedAt: isCompletedStatus(recordData.status) ? serverTimestamp() : null,
+      completedAt: isCompletedStatus(data.status) ? serverTimestamp() : null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -284,45 +234,30 @@ export async function addServiceRecord(data) {
   return trackingId;
 }
 
-export async function updateServiceRecord(id, data, previousTrackingId, previousImagePath) {
-  const imageData = await uploadRecordImage(data.imageFile, data.trackingId);
-  const recordData = {
-    ...stripRecordFormData(data),
-    ...(imageData || {})
-  };
-
-  if (data.removeImage && !imageData) {
-    recordData.imageName = '';
-    recordData.imagePath = '';
-    recordData.imageUrl = '';
-  }
-
+export async function updateServiceRecord(id, data, previousTrackingId) {
   const payload = {
-    ...recordData,
-    trackingIdLower: recordData.trackingId?.toLowerCase(),
-    completedAt: isCompletedStatus(recordData.status) ? serverTimestamp() : null,
+    ...data,
+    trackingIdLower: data.trackingId?.toLowerCase(),
+    completedAt: isCompletedStatus(data.status) ? serverTimestamp() : null,
     updatedAt: serverTimestamp()
   };
 
-  upsertLocalRecord({ id, ...recordData });
+  upsertLocalRecord({ id, ...data });
 
   try {
     await updateDoc(doc(ensureDb(), 'serviceRecords', id), payload);
 
-    if (previousTrackingId && previousTrackingId.toLowerCase() !== recordData.trackingId.toLowerCase()) {
+    if (previousTrackingId && previousTrackingId.toLowerCase() !== data.trackingId.toLowerCase()) {
       await deleteDoc(doc(ensureDb(), 'publicServiceRecords', previousTrackingId.toLowerCase()));
     }
 
-    await setDoc(doc(ensureDb(), 'publicServiceRecords', recordData.trackingId.toLowerCase()), publicRecordPayload(recordData));
-    if ((imageData || data.removeImage) && previousImagePath) {
-      await deleteRecordImage(previousImagePath);
-    }
+    await setDoc(doc(ensureDb(), 'publicServiceRecords', data.trackingId.toLowerCase()), publicRecordPayload(data));
   } catch (error) {
     console.warn('Updated locally because Firestore is unavailable:', error.message);
   }
 }
 
-export async function deleteServiceRecord(id, trackingId, imagePath) {
+export async function deleteServiceRecord(id, trackingId) {
   setLocalRecords(getLocalRecords().filter((record) => record.id !== id && record.trackingId !== trackingId));
 
   try {
@@ -330,7 +265,6 @@ export async function deleteServiceRecord(id, trackingId, imagePath) {
     if (trackingId) {
       await deleteDoc(doc(ensureDb(), 'publicServiceRecords', trackingId.toLowerCase()));
     }
-    await deleteRecordImage(imagePath);
   } catch (error) {
     console.warn('Deleted locally because Firestore is unavailable:', error.message);
   }
