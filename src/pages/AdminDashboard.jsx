@@ -124,13 +124,13 @@ export default function AdminDashboard() {
   }
 
   return (
-    <main className="min-h-screen bg-showroom-grid bg-[size:42px_42px]">
+    <main className="tech-shell min-h-screen bg-showroom-grid bg-[size:42px_42px]">
       <BrandHeader admin onLogout={handleLogout} />
       <section className="mx-auto w-full max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
         <div className="mb-7 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.24em] text-cyan-200/70">Admin Dashboard</p>
-            <h1 className="mt-2 text-3xl font-extrabold text-white sm:text-4xl">Service Command Center</h1>
+            <h1 className="tech-title mt-2 text-3xl font-extrabold text-white sm:text-4xl">Service Command Center</h1>
             <p className="mt-2 max-w-2xl text-slate-400">
               Create, assign, update, and track all Rajput Electronics service jobs.
             </p>

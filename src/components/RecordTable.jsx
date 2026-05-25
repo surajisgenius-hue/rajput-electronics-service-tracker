@@ -51,12 +51,12 @@ export default function RecordTable({ records, onEdit, onDelete, onShowQr }) {
   }
 
   return (
-    <div className="glass-panel overflow-hidden rounded-2xl">
+    <div className="glass-panel premium-card overflow-hidden rounded-2xl">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-800">
+        <table className="tech-table min-w-full divide-y divide-slate-800">
           <thead className="bg-slate-950/70">
             <tr>
-              {['Tracking', 'Customer', 'Product', 'Service', 'Status', 'Technician', 'Expected', 'Actions'].map((head) => (
+              {['Tracking', 'Customer', 'Product', 'Service', 'Status', 'Handled By', 'Expected', 'Actions'].map((head) => (
                 <th key={head} className="px-4 py-4 text-left text-xs font-extrabold uppercase tracking-wider text-slate-400">
                   {head}
                 </th>
@@ -79,7 +79,7 @@ export default function RecordTable({ records, onEdit, onDelete, onShowQr }) {
                   <div className="text-xs text-slate-500">{record.brand}</div>
                 </td>
                 <td className="px-4 py-4 text-sm text-slate-300">{record.serviceType}</td>
-                <td className="px-4 py-4"><StatusBadge status={record.status} /></td>
+                <td className="min-w-40 px-4 py-4"><StatusBadge status={record.status} /></td>
                 <td className="px-4 py-4 text-sm text-slate-300">{record.technicianName || '-'}</td>
                 <td className="px-4 py-4 text-sm text-slate-300">{record.expectedDate || '-'}</td>
                 <td className="px-4 py-4">

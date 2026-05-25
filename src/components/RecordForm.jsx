@@ -65,7 +65,7 @@ export default function RecordForm({ selectedRecord, onCancel, onSubmit, saving 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-panel rounded-2xl p-5">
+    <form onSubmit={handleSubmit} className="glass-panel premium-card tech-form rounded-2xl p-5">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-white">
@@ -120,7 +120,7 @@ export default function RecordForm({ selectedRecord, onCancel, onSubmit, saving 
           </select>
         </label>
         <label className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Technician</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Handled By</span>
           <input className="field px-4 py-3" name="technicianName" value={form.technicianName} onChange={updateField} />
         </label>
         <label className="space-y-2">

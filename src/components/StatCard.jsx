@@ -7,7 +7,7 @@ export default function StatCard({ icon: Icon, label, value, tone = 'cyan' }) {
   };
 
   return (
-    <div className={`rounded-2xl border bg-gradient-to-br to-slate-950/70 p-5 ${tones[tone]}`}>
+    <div className={`stat-card rounded-2xl border bg-gradient-to-br to-slate-950/70 p-5 ${tones[tone]}`}>
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-slate-300">{label}</span>
         <Icon size={22} />

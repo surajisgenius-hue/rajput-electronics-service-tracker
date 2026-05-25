@@ -62,7 +62,7 @@ export default function CustomerTracking() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-showroom-grid bg-[size:42px_42px]">
+    <main className="tech-shell min-h-screen overflow-hidden bg-showroom-grid bg-[size:42px_42px]">
       <BrandHeader />
 
       <section className="mx-auto w-full max-w-4xl px-4 pb-8 pt-6 sm:px-6 lg:px-8">
@@ -71,7 +71,7 @@ export default function CustomerTracking() {
             <ShieldCheck size={16} />
             Verified service tracking portal
           </div>
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl">
+          <h1 className="tech-title max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl">
             Track your service status in real time.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
@@ -108,7 +108,7 @@ export default function CustomerTracking() {
         )}
 
         {record && (
-          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="glass-panel rounded-3xl p-5 sm:p-7">
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="glass-panel premium-card rounded-3xl p-5 sm:p-7">
             <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.24em] text-cyan-200/70">Tracking ID</p>
@@ -121,7 +121,7 @@ export default function CustomerTracking() {
               <Detail icon={Cpu} label="Product" value={record.productName} />
               <Detail icon={ShieldCheck} label="Brand" value={record.brand} />
               <Detail icon={Wrench} label="Service Type" value={record.serviceType} />
-              <Detail icon={UserRoundCog} label="Technician" value={record.technicianName} />
+              <Detail icon={UserRoundCog} label="Handled By" value={record.technicianName} />
               <Detail icon={CalendarClock} label="Expected Date" value={record.expectedDate} />
               <Detail icon={Headphones} label="Customer" value={record.customerName} />
             </div>
