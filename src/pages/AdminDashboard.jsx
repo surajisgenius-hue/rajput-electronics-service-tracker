@@ -94,7 +94,7 @@ export default function AdminDashboard() {
     setSaving(true);
     try {
       if (selectedRecord) {
-        await updateServiceRecord(selectedRecord.id, data, selectedRecord.trackingId);
+        await updateServiceRecord(selectedRecord.id, data, selectedRecord.trackingId, selectedRecord.imagePath);
         toast.success('Record updated');
       } else {
         const trackingId = await addServiceRecord(data);
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
     if (!confirmed) return;
 
     try {
-      await deleteServiceRecord(record.id, record.trackingId);
+      await deleteServiceRecord(record.id, record.trackingId, record.imagePath);
       toast.success('Record deleted');
     } catch (error) {
       toast.error(error.message || 'Unable to delete record');

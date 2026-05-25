@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { ImagePlus, X } from 'lucide-react';
 import {
   SERVICE_CATEGORIES,
   getStatusOptions,
   normalizeStatusForService
 } from '../constants.js';
-import { generateTrackingId } from '../services/serviceRecords.js';
+import { MAX_RECORD_IMAGE_BYTES, generateTrackingId } from '../services/serviceRecords.js';
 
 const emptyForm = {
   trackingId: '',
@@ -16,7 +17,13 @@ const emptyForm = {
   status: getStatusOptions(SERVICE_CATEGORIES[0])[0],
   technicianName: '',
   expectedDate: '',
-  internalNotes: ''
+  internalNotes: '',
+  imageFile: null,
+  imageName: '',
+  imagePath: '',
+  imageUrl: '',
+  imagePreviewUrl: '',
+  removeImage: false
 };
 
 export default function RecordForm({ selectedRecord, onCancel, onSubmit, saving }) {
@@ -37,7 +44,13 @@ export default function RecordForm({ selectedRecord, onCancel, onSubmit, saving 
         ),
         technicianName: selectedRecord.technicianName || '',
         expectedDate: selectedRecord.expectedDate || '',
-        internalNotes: selectedRecord.internalNotes || ''
+        internalNotes: selectedRecord.internalNotes || '',
+        imageFile: null,
+        imageName: selectedRecord.imageName || '',
+        imagePath: selectedRecord.imagePath || '',
+        imageUrl: selectedRecord.imageUrl || '',
+        imagePreviewUrl: selectedRecord.imageUrl || '',
+        removeImage: false
       });
     } else {
       setForm({ ...emptyForm, trackingId: generateTrackingId() });
@@ -57,6 +70,40 @@ export default function RecordForm({ selectedRecord, onCancel, onSubmit, saving 
 
       return { ...current, [name]: value };
     });
+  }
+
+  function updateImage(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file.');
+      event.target.value = '';
+      return;
+    }
+    if (file.size > MAX_RECORD_IMAGE_BYTES) {
+      alert('Image size should be 5 MB or less.');
+      event.target.value = '';
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      imageFile: file,
+      imageName: file.name,
+      imagePreviewUrl: URL.createObjectURL(file),
+      removeImage: false
+    }));
+  }
+
+  function removeImage() {
+    setForm((current) => ({
+      ...current,
+      imageFile: null,
+      imageName: '',
+      imagePreviewUrl: '',
+      imageUrl: '',
+      removeImage: Boolean(current.imagePath)
+    }));
   }
 
   function handleSubmit(event) {
@@ -137,6 +184,42 @@ export default function RecordForm({ selectedRecord, onCancel, onSubmit, saving 
             placeholder="Hidden from customer"
           />
         </label>
+        <div className="space-y-2 md:col-span-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Service Image</span>
+          <div className="rounded-2xl border border-slate-700 bg-slate-950/45 p-3">
+            {form.imagePreviewUrl ? (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <img
+                  src={form.imagePreviewUrl}
+                  alt="Selected service"
+                  className="h-24 w-24 rounded-xl border border-slate-700 object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-bold text-white">{form.imageName || 'Selected image'}</p>
+                  <p className="mt-1 text-xs text-slate-500">Stored with this service record.</p>
+                </div>
+                <button type="button" onClick={removeImage} className="btn-secondary flex items-center justify-center gap-2 px-3 py-2 text-xs">
+                  <X size={14} />
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-600 px-4 py-6 text-center hover:border-cyan-300/60">
+                <ImagePlus className="text-cyan-200" size={26} />
+                <span className="mt-2 text-sm font-bold text-white">Upload image</span>
+                <span className="mt-1 text-xs text-slate-500">JPG, PNG, or WebP up to 5 MB</span>
+                <input type="file" accept="image/*" className="sr-only" onChange={updateImage} />
+              </label>
+            )}
+            {form.imagePreviewUrl && (
+              <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-xs font-bold text-cyan-100 hover:border-cyan-300/60">
+                <ImagePlus size={14} />
+                Replace image
+                <input type="file" accept="image/*" className="sr-only" onChange={updateImage} />
+              </label>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">
