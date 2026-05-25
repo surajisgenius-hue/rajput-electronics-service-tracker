@@ -13,15 +13,15 @@ import {
   updateDoc,
   where
 } from 'firebase/firestore';
+import { COMPLETED_STATUS_OPTIONS } from '../constants.js';
 import { db } from '../firebase.js';
 
 const LOCAL_RECORDS_KEY = 'rajput-electronics-service-records';
 const LOCAL_RECORDS_EVENT = 'rajput-electronics-records-updated';
-const COMPLETED_STATUSES = ['Completed', 'Delivered'];
 const COMPLETED_RECORD_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function isCompletedStatus(status) {
-  return COMPLETED_STATUSES.includes(status);
+  return COMPLETED_STATUS_OPTIONS.includes(status);
 }
 
 function toMillis(value) {
@@ -127,8 +127,9 @@ export function generateTrackingId() {
     .toISOString()
     .slice(2, 10)
     .replaceAll('-', '');
-  const random = Math.random().toString(36).slice(2, 7).toUpperCase();
-  return `RE-${stamp}-${random}`;
+  const firstGroup = Math.random().toString(36).slice(2, 6).toUpperCase();
+  const secondGroup = Math.random().toString(36).slice(2, 4).toUpperCase();
+  return `RJX-${stamp}-${firstGroup}-${secondGroup}`;
 }
 
 export function subscribeToServiceRecords(callback, onError) {

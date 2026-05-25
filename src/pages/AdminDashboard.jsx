@@ -6,7 +6,7 @@ import QRCodeModal from '../components/QRCodeModal.jsx';
 import RecordForm from '../components/RecordForm.jsx';
 import RecordTable from '../components/RecordTable.jsx';
 import StatCard from '../components/StatCard.jsx';
-import { STATUS_OPTIONS } from '../constants.js';
+import { COMPLETED_STATUS_OPTIONS, IN_PROGRESS_STATUS_OPTIONS, STATUS_OPTIONS } from '../constants.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import {
   addServiceRecord,
@@ -78,10 +78,8 @@ export default function AdminDashboard() {
   }, [records, search, statusFilter]);
 
   const stats = useMemo(() => {
-    const completed = records.filter((record) => ['Completed', 'Delivered'].includes(record.status)).length;
-    const inProgress = records.filter((record) =>
-      ['Technician Assigned', 'Visit Scheduled', 'Installation in Progress', 'Diagnosis', 'Repair in Progress', 'Part Required', 'Ready'].includes(record.status)
-    ).length;
+    const completed = records.filter((record) => COMPLETED_STATUS_OPTIONS.includes(record.status)).length;
+    const inProgress = records.filter((record) => IN_PROGRESS_STATUS_OPTIONS.includes(record.status)).length;
     return {
       total: records.length,
       inProgress,

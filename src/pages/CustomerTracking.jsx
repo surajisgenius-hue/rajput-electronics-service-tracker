@@ -65,14 +65,14 @@ export default function CustomerTracking() {
     <main className="min-h-screen overflow-hidden bg-showroom-grid bg-[size:42px_42px]">
       <BrandHeader />
 
-      <section className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 pb-12 pt-6 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:pb-20">
+      <section className="mx-auto w-full max-w-4xl px-4 pb-8 pt-6 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-neon-blue/25 bg-neon-blue/10 px-4 py-2 text-sm font-bold text-cyan-100">
             <ShieldCheck size={16} />
             Verified service tracking portal
           </div>
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
-            Track your installation and repair service status in real time.
+          <h1 className="max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl">
+            Track your service status in real time.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
             Enter your Rajput Electronics tracking ID or barcode number provided by our staff.
@@ -89,7 +89,7 @@ export default function CustomerTracking() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               className="field min-h-14 flex-1 px-5 text-base"
-              placeholder="Enter Tracking ID, e.g. RE-260525-AB12C"
+              placeholder="Enter Tracking ID, e.g. RJX-260525-K7M2-8Q"
             />
             <button disabled={loading} className="btn-primary flex min-h-14 items-center justify-center gap-2 px-6 disabled:opacity-60">
               <Search size={19} />
@@ -98,34 +98,9 @@ export default function CustomerTracking() {
           </form>
           {!isFirebaseConfigured && <FirebaseSetupNotice />}
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.12, duration: 0.5 }}
-          className="glass-panel rounded-3xl p-6"
-        >
-          <div className="relative overflow-hidden rounded-2xl border border-cyan-300/20 bg-showroom-900 p-6">
-            <div className="absolute right-4 top-4 flex h-24 w-24 items-center justify-center rounded-full border border-neon-blue/25 bg-white p-3 shadow-glow">
-              <img src="/rajput-logo.png" alt="Rajput Electronics logo" className="h-full w-full object-contain" />
-            </div>
-            <Cpu className="text-neon-blue" size={36} />
-            <h2 className="mt-10 text-2xl font-extrabold">Rajput Premium Service Desk</h2>
-            <p className="mt-3 text-slate-400">
-              Track TV installation, lighting installation, CCTV installation, paid repairs, and warranty service updates in one place.
-            </p>
-            <div className="mt-8 grid grid-cols-2 gap-3">
-              {['FAST SERVICE', 'TRUSTED SHOP', 'HASSLE FREE SERVICE', 'ONLINE LIVE TRACKING'].map((item) => (
-                <div key={item} className="rounded-xl border border-slate-700 bg-slate-950/55 p-3 text-sm font-bold text-cyan-50">
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-5xl px-4 pb-14 sm:px-6 lg:px-8">
         {loading && (
           <div className="glass-panel flex justify-center rounded-2xl p-10">
             <div className="loader" />
