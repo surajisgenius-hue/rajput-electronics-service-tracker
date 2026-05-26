@@ -18,7 +18,9 @@ export default [
         console: 'readonly',
         URL: 'readonly',
         Event: 'readonly',
-        crypto: 'readonly'
+        crypto: 'readonly',
+        fetch: 'readonly',
+        process: 'readonly'
       },
       parserOptions: {
         ecmaFeatures: {
